@@ -2,9 +2,9 @@
 // @id             iitc-plugin-draw-tools-mobile@eccenux
 // @name           IITC plugin: draw tools mobile
 // @category       Layer
-// @version        0.7.1
+// @version        0.0.2
 // @namespace      https://github.com/jonatkins/ingress-intel-total-conversion
-// @description    [0.7.1] Allow drawing things onto the current map so you may plan your next move. Mobile device optymisations.
+// @description    [0.0.2] Allow drawing things onto the current map so you may plan your next move. Mobile device optymisations.
 // @include        https://*.ingress.com/intel*
 // @include        http://*.ingress.com/intel*
 // @match          https://*.ingress.com/intel*
@@ -264,8 +264,21 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 
 			this._tooltip.updateContent(this._getTooltipText());
 
-			this._map
+			// create shade to enable clicking over portals and other layers
+			if (!this._clickShade) {
+				this._clickShade = new L.Rectangle(this._map.getBounds(), {
+					stroke: false,
+					color: '#eee',
+					weight: 4,
+					opacity: 0.2,
+					fill: true,
+					clickable: true
+				});
+			}
+			this._clickShade
 				.on('click', this._onClick, this)
+			;
+			this._map.addLayer(this._clickShade);
 		}
 	},
 
@@ -284,11 +297,12 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		this._map.removeLayer(this._poly);
 		delete this._poly;
 
+		this._clickShade.off('click', this._onClick, this);
+		this._map.removeLayer(this._clickShade);
+		delete this._clickShade;
+
 		// clean up DOM
 		this._clearGuides();
-
-		this._map
-			.off('click', this._onClick, this);
 	},
 
 	_finishShape: function () {
