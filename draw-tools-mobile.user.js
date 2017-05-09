@@ -264,30 +264,8 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 
 			this._tooltip.updateContent(this._getTooltipText());
 
-			// Make a transparent marker that will used to catch click events. These click
-			// events will create the vertices. We need to do this so we can ensure that
-			// we can create vertices over other map layers (markers, vector layers). We
-			// also do not want to trigger any click handlers of objects we are clicking on
-			// while drawing.
-			if (!this._mouseMarker) {
-				this._mouseMarker = L.marker(this._map.getCenter(), {
-					icon: L.divIcon({
-						className: 'leaflet-mouse-marker',
-						iconAnchor: [20, 20],
-						iconSize: [40, 40]
-					}),
-					opacity: 0,
-					zIndexOffset: this.options.zIndexOffset
-				});
-			}
-
-			this._mouseMarker
-				.on('click', this._onClick, this)
-				.addTo(this._map);
-
 			this._map
-				.on('mousemove', this._onMouseMove, this)
-				.on('zoomend', this._onZoomEnd, this);
+				.on('click', this._onClick, this)
 		}
 	},
 
@@ -306,16 +284,11 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		this._map.removeLayer(this._poly);
 		delete this._poly;
 
-		this._mouseMarker.off('click', this._onClick, this);
-		this._map.removeLayer(this._mouseMarker);
-		delete this._mouseMarker;
-
 		// clean up DOM
 		this._clearGuides();
 
 		this._map
-			.off('mousemove', this._onMouseMove, this)
-			.off('zoomend', this._onZoomEnd, this);
+			.off('click', this._onClick, this);
 	},
 
 	_finishShape: function () {
@@ -343,27 +316,8 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		this._updateGuide();
 	},
 
-	_onMouseMove: function (e) {
-		var newPos = e.layerPoint,
-			latlng = e.latlng;
-
-		// Save latlng
-		// should this be moved to _updateGuide() ?
-		this._currentLatLng = latlng;
-
-		this._updateTooltip(latlng);
-
-		// Update the guide line
-		this._updateGuide(newPos);
-
-		// Update the mouse marker position
-		this._mouseMarker.setLatLng(latlng);
-
-		L.DomEvent.preventDefault(e.originalEvent);
-	},
-
 	_onClick: function (e) {
-		var latlng = e.target.getLatLng(),
+		var latlng = e.latlng,
 			markerCount = this._markers.length;
 
                 if (this.options.snapPoint) latlng = this.options.snapPoint(latlng);
