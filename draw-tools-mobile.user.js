@@ -1,12 +1,10 @@
 ﻿// ==UserScript==
-// @id             iitc-plugin-draw-tools@breunigs
-// @name           IITC plugin: draw tools
+// @id             iitc-plugin-draw-tools-mobile@eccenux
+// @name           IITC plugin: draw tools mobile
 // @category       Layer
-// @version        0.7.0.20170108.21732
+// @version        0.7.1
 // @namespace      https://github.com/jonatkins/ingress-intel-total-conversion
-// @updateURL      https://static.iitc.me/build/release/plugins/draw-tools.meta.js
-// @downloadURL    https://static.iitc.me/build/release/plugins/draw-tools.user.js
-// @description    [iitc-2017-01-08-021732] Allow drawing things onto the current map so you may plan your next move.
+// @description    [0.7.1] Allow drawing things onto the current map so you may plan your next move. Mobile device optymisations.
 // @include        https://*.ingress.com/intel*
 // @include        http://*.ingress.com/intel*
 // @match          https://*.ingress.com/intel*
@@ -22,14 +20,6 @@
 function wrapper(plugin_info) {
 // ensure plugin framework is there, even if iitc is not yet loaded
 if(typeof window.plugin !== 'function') window.plugin = function() {};
-
-//PLUGIN AUTHORS: writing a plugin outside of the IITC build environment? if so, delete these lines!!
-//(leaving them in place might break the 'About IITC' page or break update checks)
-plugin_info.buildName = 'iitc';
-plugin_info.dateTimeVersion = '20170108.21732';
-plugin_info.pluginId = 'draw-tools';
-//END PLUGIN AUTHORS NOTE
-
 
 
 // PLUGIN START ////////////////////////////////////////////////////////
