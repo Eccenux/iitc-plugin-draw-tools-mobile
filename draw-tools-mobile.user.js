@@ -253,7 +253,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 	},
 
 	addHooks: function () {
-        console.log('[mdraw]', 'addHooks poly');
+		console.log('[mdraw]', 'addHooks poly');
 		L.Draw.Feature.prototype.addHooks.call(this);
 		if (this._map) {
 			this._markers = [];
@@ -265,26 +265,28 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 
 			this._tooltip.updateContent(this._getTooltipText());
 
-			// create shade to enable clicking over portals and other layers
-			if (!this._clickShade) {
-				this._clickShade = new L.Rectangle(this._map.getBounds(), {
-					stroke: false,
-					color: '#eee',
-					weight: 4,
-					opacity: 0.2,
-					fill: true,
-					clickable: true
-				});
+			/**/
+			if (this._clickListener) {
+				console.log('[mdraw]', 'remove _clickListener');
+				this._map._container.removeListener('click', this._clickListener, true);
 			}
-			this._clickShade
-				.on('click', this._onClick, this)
-			;
-			this._map.addLayer(this._clickShade);
+			var me = this;
+			//setTimeout(function(){
+				me._clickListener = function(e) {
+					console.log('[mdraw]', '_clickListener poly', e);
+					if (e.target.nodeName == 'svg'
+					|| $(event.target).parents('svg').length > 0) {
+						me._onClick(e);
+					}			
+				};
+				me._map._container.addEventListener('click', me._clickListener, true);
+			//}, 200);
 		}
 	},
+	_clickListener: null,
 
 	removeHooks: function () {
-        console.log('[mdraw]', 'removeHooks poly');
+		console.log('[mdraw]', 'removeHooks poly');
 		L.Draw.Feature.prototype.removeHooks.call(this);
 
 		this._clearHideErrorTimeout();
@@ -299,9 +301,10 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		this._map.removeLayer(this._poly);
 		delete this._poly;
 
-		this._clickShade.off('click', this._onClick, this);
-		this._map.removeLayer(this._clickShade);
-		delete this._clickShade;
+		if (this._clickListener && this._map && this._map._container instanceof Element) {
+			this._map._container.removeEventListener('click', this._clickListener, true);
+			this._clickListener = null;
+		}
 
 		// clean up DOM
 		this._clearGuides();
@@ -333,11 +336,16 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 	},
 
 	_onClick: function (e) {
-        console.log('[mdraw]', '_onClick poly', e);
-		var latlng = e.latlng,
+		console.log('[mdraw]', '_onClick poly', e);
+		// break the propagation chains
+		//e.preventDefault();
+		//e.stopPropagation();
+		//e.stopImmediatePropagation();
+
+		var latlng = this._map.mouseEventToLatLng(e),
 			markerCount = this._markers.length;
 
-                if (this.options.snapPoint) latlng = this.options.snapPoint(latlng);
+		if (this.options.snapPoint) latlng = this.options.snapPoint(latlng);
 
 		if (markerCount > 0 && !this.options.allowIntersection && this._poly.newLatLngIntersects(latlng)) {
 			this._showErrorTooltip();
@@ -355,13 +363,15 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			this._map.addLayer(this._poly);
 		}
 
-		this._updateFinishHandler();
-
+		//setTimeout(()=>{
+			this._updateFinishHandler();
+		//}, 1000);
+		
 		this._vertexAdded(latlng);
 
 		this._clearGuides();
 
-		this._updateTooltip();
+		//this._updateTooltip();
 	},
 
 	_updateFinishHandler: function () {
