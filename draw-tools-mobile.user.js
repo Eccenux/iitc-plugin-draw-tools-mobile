@@ -2,9 +2,9 @@
 // @id             iitc-plugin-draw-tools-mobile@eccenux
 // @name           IITC plugin: draw tools mobile
 // @category       Layer
-// @version        0.0.2
+// @version        0.0.3
 // @namespace      https://github.com/jonatkins/ingress-intel-total-conversion
-// @description    [0.0.2] Allow drawing things onto the current map so you may plan your next move. Mobile device optimization.
+// @description    [0.0.3] Allow drawing things onto the current map so you may plan your next move. Mobile device optimization.
 // @include        https://*.ingress.com/intel*
 // @include        http://*.ingress.com/intel*
 // @match          https://*.ingress.com/intel*
@@ -266,14 +266,18 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			this._tooltip.updateContent(this._getTooltipText());
 
 			/**/
+			// remove previous listener (shouldn't really happen)
 			if (this._clickListener) {
-				console.log('[mdraw]', 'remove _clickListener');
+				console.warn('[mdraw]', 'remove _clickListener');
 				this._map._container.removeListener('click', this._clickListener, true);
 			}
+			// add click/tap handling
+			// note that it uses #map as a base but only catches events in the SVG part of the map at the moment...
+			// might want to change this to only capture events in svg element maybe...
 			var me = this;
 			//setTimeout(function(){
 				me._clickListener = function(e) {
-					console.log('[mdraw]', '_clickListener poly', e);
+					//console.log('[mdraw]', '_clickListener poly', e);
 					if (e.target.nodeName == 'svg'
 					|| $(event.target).parents('svg').length > 0) {
 						me._onClick(e);
@@ -281,6 +285,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 				};
 				me._map._container.addEventListener('click', me._clickListener, true);
 			//}, 200);
+			/**/
 		}
 	},
 	_clickListener: null,
@@ -336,8 +341,12 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 	},
 
 	_onClick: function (e) {
-		console.log('[mdraw]', '_onClick poly', e);
+		//console.log('[mdraw]', '_onClick poly', e);
+
 		// break the propagation chains
+		// Note! Not doing this at the moment because it seems not needed
+		// (it might actually be useful to see which portal was clicked)
+		// And also breking propagation in capture phase might not be a good idea and give weird results...
 		//e.preventDefault();
 		//e.stopPropagation();
 		//e.stopImmediatePropagation();
@@ -371,6 +380,8 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 
 		this._clearGuides();
 
+		// cannot update tooltip because we don't track current position...
+		// ...and also do those tooltips really make sense on mobile? 
 		//this._updateTooltip();
 	},
 
