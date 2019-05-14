@@ -17,7 +17,7 @@
 // ==/UserScript==
 
 
-function wrapper(plugin_info) {
+//function wrapper(plugin_info) {
 // ensure plugin framework is there, even if iitc is not yet loaded
 if(typeof window.plugin !== 'function') window.plugin = function() {};
 
@@ -253,6 +253,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 	},
 
 	addHooks: function () {
+        console.log('[mdraw]', 'addHooks poly');
 		L.Draw.Feature.prototype.addHooks.call(this);
 		if (this._map) {
 			this._markers = [];
@@ -283,6 +284,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 	},
 
 	removeHooks: function () {
+        console.log('[mdraw]', 'removeHooks poly');
 		L.Draw.Feature.prototype.removeHooks.call(this);
 
 		this._clearHideErrorTimeout();
@@ -331,6 +333,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 	},
 
 	_onClick: function (e) {
+        console.log('[mdraw]', '_onClick poly', e);
 		var latlng = e.latlng,
 			markerCount = this._markers.length;
 
@@ -5374,7 +5377,7 @@ window.plugin.drawTools.boot = function() {
 
 }
 
-
+function wrapper(plugin_info) {
 var setup =  window.plugin.drawTools.loadExternals;
 
 // PLUGIN END //////////////////////////////////////////////////////////
