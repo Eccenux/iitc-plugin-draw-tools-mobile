@@ -2,9 +2,9 @@
 // @id             iitc-plugin-draw-tools-mobile@eccenux
 // @name           IITC plugin: draw tools mobile
 // @category       Layer
-// @version        0.0.3
+// @version        0.1.0
 // @namespace      https://github.com/jonatkins/ingress-intel-total-conversion
-// @description    [0.0.3] Allow drawing things onto the current map so you may plan your next move. Mobile device optimization.
+// @description    [0.1.0] Allow drawing things onto the current map so you may plan your next move. Mobile device optimization.
 // @include        https://*.ingress.com/intel*
 // @include        http://*.ingress.com/intel*
 // @match          https://*.ingress.com/intel*
@@ -902,71 +902,62 @@ L.Draw.Marker = L.Draw.Feature.extend({
 		if (this._map) {
 			this._tooltip.updateContent({ text: L.drawLocal.draw.handlers.marker.tooltip.start });
 
-			// Same mouseMarker as in Draw.Polyline
-			if (!this._mouseMarker) {
-				this._mouseMarker = L.marker(this._map.getCenter(), {
-					icon: L.divIcon({
-						className: 'leaflet-mouse-marker',
-						iconAnchor: [20, 20],
-						iconSize: [40, 40]
-					}),
-					opacity: 0,
-					zIndexOffset: this.options.zIndexOffset
-				});
+			// same as for polyline
+			/**/
+			// remove previous listener (shouldn't really happen)
+			if (this._clickListener) {
+				console.warn('[mdraw]', 'remove _clickListener');
+				this._map._container.removeListener('click', this._clickListener, true);
 			}
-
-			this._mouseMarker
-				.on('click', this._onClick, this)
-				.addTo(this._map);
-
-			this._map.on('mousemove', this._onMouseMove, this);
+			// add click/tap handling
+			// note that it uses #map as a base but only catches events in the SVG part of the map at the moment...
+			// might want to change this to only capture events in svg element maybe...
+			var me = this;
+			//setTimeout(function(){
+				me._clickListener = function(e) {
+					//console.log('[mdraw]', '_clickListener poly', e);
+					if (e.target.nodeName == 'svg'
+					|| $(event.target).parents('svg').length > 0) {
+						me._onClick(e);
+					}			
+				};
+				me._map._container.addEventListener('click', me._clickListener, true);
+			//}, 200);
+			/**/
 		}
-	},
+	},	
 
 	removeHooks: function () {
 		L.Draw.Feature.prototype.removeHooks.call(this);
 
 		if (this._map) {
-			if (this._marker) {
-				this._marker.off('click', this._onClick, this);
-				this._map
-					.off('click', this._onClick, this)
-					.removeLayer(this._marker);
-				delete this._marker;
+			if (this._clickListener && this._map && this._map._container instanceof Element) {
+				this._map._container.removeEventListener('click', this._clickListener, true);
+				this._clickListener = null;
 			}
-
-			this._mouseMarker.off('click', this._onClick, this);
-			this._map.removeLayer(this._mouseMarker);
-			delete this._mouseMarker;
-
-			this._map.off('mousemove', this._onMouseMove, this);
 		}
 	},
 
-	_onMouseMove: function (e) {
-		var latlng = e.latlng;
-
-		this._tooltip.updatePosition(latlng);
-		this._mouseMarker.setLatLng(latlng);
-
-		if (!this._marker) {
-			this._marker = new L.Marker(latlng, {
-				icon: this.options.icon,
-				zIndexOffset: this.options.zIndexOffset
-			});
-			// Bind to both marker and map to make sure we get the click event.
-			this._marker.on('click', this._onClick, this);
-			this._map
-				.on('click', this._onClick, this)
-				.addLayer(this._marker);
+	_onClick: function (e) {
+		var latlng = this._map.mouseEventToLatLng(e);
+		// ignore same LL
+		if (this._previousLL 
+			&& this._previousLL.lat == latlng.lat
+			&& this._previousLL.lng == latlng.lng) {
+			return;
 		}
-		else {
-			this._marker.setLatLng(latlng);
-		}
-	},
+		this._previousLL = latlng;
 
-	_onClick: function () {
-                if (this.options.snapPoint) this._marker.setLatLng(this.options.snapPoint(this._marker.getLatLng()));
+		/**/
+		// create marker
+		this._marker = new L.Marker(latlng, {
+			icon: this.options.icon,
+			zIndexOffset: this.options.zIndexOffset
+		});
+		this._map.addLayer(this._marker);
+		/**/
+
+		if (this.options.snapPoint) this._marker.setLatLng(this.options.snapPoint(this._marker.getLatLng()));
 
 		this._fireCreatedEvent();
 
