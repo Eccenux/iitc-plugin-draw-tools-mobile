@@ -3,8 +3,8 @@
 // @name           IITC plugin: draw tools mobile
 // @category       Layer
 // @namespace      https://github.com/jonatkins/ingress-intel-total-conversion
-// @version        0.2.0
-// @description    [0.2.0] Allow drawing things onto the current map so you may plan your next move. Mobile device optimization.
+// @version        0.2.1
+// @description    [0.2.1] Allow drawing things onto the current map so you may plan your next move. Mobile device optimization.
 // @include        https://*.ingress.com/intel*
 // @include        http://*.ingress.com/intel*
 // @match          https://*.ingress.com/intel*
@@ -253,7 +253,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 	},
 
 	addHooks: function () {
-		console.log('[mdraw]', 'addHooks poly');
+		//console.log('[mdraw]', 'addHooks poly');
 		L.Draw.Feature.prototype.addHooks.call(this);
 		if (this._map) {
 			this._markers = [];
@@ -268,8 +268,8 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			/**/
 			// remove previous listener (shouldn't really happen)
 			if (this._clickListener) {
-				console.warn('[mdraw]', 'remove _clickListener');
-				this._map._container.removeListener('click', this._clickListener, true);
+				//console.warn('[mdraw]', 'remove _clickListener');
+				this._map._container.removeEventListener('click', this._clickListener, true);
 			}
 			// add click/tap handling
 			// note that it uses #map as a base but only catches events in the SVG part of the map at the moment...
@@ -291,7 +291,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 	_clickListener: null,
 
 	removeHooks: function () {
-		console.log('[mdraw]', 'removeHooks poly');
+		//console.log('[mdraw]', 'removeHooks poly');
 		L.Draw.Feature.prototype.removeHooks.call(this);
 
 		this._clearHideErrorTimeout();
@@ -931,6 +931,7 @@ L.Draw.Marker = L.Draw.Feature.extend({
 	},
 
 	initialize: function (map, options) {
+		//console.log('[Draw.Marker]', 'initialize', arguments);
 		// Save the type so super can fire, need to do this as cannot do this.TYPE :(
 		this.type = L.Draw.Marker.TYPE;
 
@@ -938,6 +939,7 @@ L.Draw.Marker = L.Draw.Feature.extend({
 	},
 
 	addHooks: function () {
+		//console.log('[Draw.Marker]', 'addHooks', arguments);
 		L.Draw.Feature.prototype.addHooks.call(this);
 
 		if (this._map) {
@@ -947,8 +949,8 @@ L.Draw.Marker = L.Draw.Feature.extend({
 			/**/
 			// remove previous listener (shouldn't really happen)
 			if (this._clickListener) {
-				console.warn('[mdraw]', 'remove _clickListener');
-				this._map._container.removeListener('click', this._clickListener, true);
+				console.warn('[Draw.Marker]', 'remove _clickListener');
+				this._map._container.removeEventListener('click', this._clickListener, true);
 			}
 			// add click/tap handling
 			// note that it uses #map as a base but only catches events in the SVG part of the map at the moment...
@@ -956,7 +958,7 @@ L.Draw.Marker = L.Draw.Feature.extend({
 			var me = this;
 			//setTimeout(function(){
 				me._clickListener = function(e) {
-					//console.log('[mdraw]', '_clickListener poly', e);
+					//console.log('[Draw.Marker]', '_clickListener', e);
 					if (e.target.nodeName == 'svg'
 					|| $(event.target).parents('svg').length > 0) {
 						me._onClick(e);
@@ -969,6 +971,7 @@ L.Draw.Marker = L.Draw.Feature.extend({
 	},	
 
 	removeHooks: function () {
+		//console.log('[Draw.Marker]', 'removeHooks', arguments);
 		L.Draw.Feature.prototype.removeHooks.call(this);
 
 		if (this._map) {
@@ -981,6 +984,7 @@ L.Draw.Marker = L.Draw.Feature.extend({
 
 	_onClick: function (e) {
 		var latlng = this._map.mouseEventToLatLng(e);
+		//console.log('[Draw.Marker]', '_onClick', latlng);
 		// ignore same LL
 		if (this._previousLL 
 			&& this._previousLL.lat == latlng.lat
@@ -990,6 +994,7 @@ L.Draw.Marker = L.Draw.Feature.extend({
 		this._previousLL = latlng;
 
 		/**/
+		//console.log('[Draw.Marker]', 'create marker', latlng);
 		// create marker
 		this._marker = new L.Marker(latlng, {
 			icon: this.options.icon,
@@ -1002,6 +1007,7 @@ L.Draw.Marker = L.Draw.Feature.extend({
 
 		this._fireCreatedEvent();
 
+		// disable & enable adding next marker
 		this.disable();
 		if (this.options.repeatMode) {
 			this.enable();
@@ -1009,8 +1015,8 @@ L.Draw.Marker = L.Draw.Feature.extend({
 	},
 
 	_fireCreatedEvent: function () {
-		var marker = new L.Marker(this._marker.getLatLng(), { icon: this.options.icon });
-		L.Draw.Feature.prototype._fireCreatedEvent.call(this, marker);
+		//console.log('[Draw.Marker]', '_fireCreatedEvent');
+		L.Draw.Feature.prototype._fireCreatedEvent.call(this, this._marker);
 	}
 });
 
