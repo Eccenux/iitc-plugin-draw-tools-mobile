@@ -81,6 +81,7 @@ L.drawLocal = {
 				}
 			},
 			polyline: {
+				totalDistance: 'total',
 				error: '<strong>Error:</strong> shape edges cannot cross!',
 				tooltip: {
 					start: 'Click to start drawing line.',
@@ -371,31 +372,6 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 
 		this._markers.push(this._createMarker(latlng));
 
-		// show distance of last section of the polyline
-		if (this._markers.length >= 2) {
-			// calculate distances
-			var prevMarker = this._markers[this._markers.length - 2].getLatLng();
-			var lastMarker = this._markers[this._markers.length - 1].getLatLng();
-			var currentDistance = lastMarker.distanceTo(prevMarker);
-			var totalDistance = (this._measurementRunningTotal) ? this._measurementRunningTotal + currentDistance : currentDistance;
-			var readableDistances = {
-				current: L.GeometryUtil.readableDistance(currentDistance, this.options.metric),
-				total: L.GeometryUtil.readableDistance(totalDistance, this.options.metric),
-			};
-
-			//console.log(readableDistances);
-		
-			// show tooltip with distances
-			this._tooltip.updatePosition(lastMarker);
-			var labelText = {
-				text: readableDistances.total,
-			};
-			if (currentDistance != totalDistance) {
-				labelText.subtext = readableDistances.current;
-			}
-			this._tooltip.updateContent(labelText);
-		}
-
 		this._poly.addLatLng(latlng);
 
 		if (this._poly.getLatLngs().length === 2) {
@@ -406,13 +382,10 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			this._updateFinishHandler();
 		//}, 1000);
 		
+		this._updateTooltip(latlng);
 		this._vertexAdded(latlng);
 
 		this._clearGuides();
-
-		// cannot update tooltip because we don't track current position...
-		// ...and also do those tooltips really make sense on mobile? 
-		//this._updateTooltip();
 	},
 
 	_updateFinishHandler: function () {
@@ -545,14 +518,35 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 	},
 
 	_getMeasurementString: function () {
+		/*
 		var currentLatLng = this._currentLatLng,
 			previousLatLng = this._markers[this._markers.length - 1].getLatLng(),
 			distance;
+		*/
 
-		// calculate the distance from the last fixed point to the mouse position
-		distance = this._measurementRunningTotal + currentLatLng.distanceTo(previousLatLng);
+		// skip if only marker is positioned
+		if (this._markers.length < 2) {
+			return "";
+		}
 
-		return L.GeometryUtil.readableDistance(distance, this.options.metric);
+		// calculate distances
+		var prevMarker = this._markers[this._markers.length - 2].getLatLng();
+		var lastMarker = this._markers[this._markers.length - 1].getLatLng();
+		var currentDistance = lastMarker.distanceTo(prevMarker);
+		var totalDistance = this._measurementRunningTotal + currentDistance;
+		var readableDistances = {
+			current: L.GeometryUtil.readableDistance(currentDistance, this.options.metric),
+			total: L.GeometryUtil.readableDistance(totalDistance, this.options.metric),
+		};
+
+		//console.log(readableDistances);
+		
+		// only current
+		if (currentDistance == totalDistance) {
+			return readableDistances.current;
+		}
+
+		return `${readableDistances.current} (${L.drawLocal.draw.handlers.polyline.totalDistance}: ${readableDistances.total})`;
 	},
 
 	_showErrorTooltip: function () {
