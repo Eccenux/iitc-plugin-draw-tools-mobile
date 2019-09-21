@@ -3,8 +3,8 @@
 // @name           IITC plugin: draw tools mobile
 // @category       Layer
 // @namespace      https://github.com/jonatkins/ingress-intel-total-conversion
-// @version        0.2.2
-// @description    [0.2.2] Allow drawing things onto the current map so you may plan your next move. Mobile device optimization.
+// @version        0.2.3
+// @description    [0.2.3] Allow drawing things onto the current map so you may plan your next move. Mobile device optimization.
 // @include        https://*.ingress.com/intel*
 // @include        http://*.ingress.com/intel*
 // @match          https://*.ingress.com/intel*
@@ -75,18 +75,18 @@ L.drawLocal = {
 			},
 			polygon: {
 				tooltip: {
-					start: 'Click to start drawing shape.',
-					cont: 'Click to continue drawing shape.',
-					end: 'Click first point to close this shape.'
+					start: 'Tap to start drawing shape.',
+					cont: 'Tap to continue drawing shape.',
+					end: 'Tap tip to close this shape.'
 				}
 			},
 			polyline: {
 				totalDistance: 'total',
 				error: '<strong>Error:</strong> shape edges cannot cross!',
 				tooltip: {
-					start: 'Click to start drawing line.',
-					cont: 'Click to continue drawing line.',
-					end: 'Click last point to finish line.'
+					start: 'Tap to start drawing line.',
+					cont: 'Tap to continue drawing line.',
+					end: 'Tap tip to finish line.'
 				}
 			},
 			rectangle: {
