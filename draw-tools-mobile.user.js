@@ -266,6 +266,9 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			this._poly = new L.GeodesicPolyline([], this.options.shapeOptions);
 
 			this._tooltip.updateContent(this._getTooltipText());
+			this._tooltip._container.addEventListener('click', () => {
+				this._finishShape();
+			});
 
 			/**/
 			// remove previous listener (shouldn't really happen)
