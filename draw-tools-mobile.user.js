@@ -374,7 +374,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			var prevMarker = this._markers[this._markers.length - 2].getLatLng();
 			var lastMarker = this._markers[this._markers.length - 1].getLatLng();
 			var currentDistance = lastMarker.distanceTo(prevMarker);
-			var totalDistance = this._measurementRunningTotal + currentDistance;
+			var totalDistance = (this._measurementRunningTotal) ? this._measurementRunningTotal + currentDistance : currentDistance;
 			var readableDistances = {
 				current: L.GeometryUtil.readableDistance(currentDistance, this.options.metric),
 				total: L.GeometryUtil.readableDistance(totalDistance, this.options.metric),
