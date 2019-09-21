@@ -1699,7 +1699,9 @@ L.GeometryUtil = {
 		var areaStr;
 
 		if (isMetric) {
-			if (area >= 10000) {
+			if (area >= 100000) {
+				areaStr = (area * 0.000001).toFixed(2) + ' km&sup2;';
+			} else if (area >= 1000) {
 				areaStr = (area * 0.0001).toFixed(2) + ' ha';
 			} else {
 				areaStr = area.toFixed(2) + ' m&sup2;';
