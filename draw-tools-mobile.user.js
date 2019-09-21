@@ -368,6 +368,31 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 
 		this._markers.push(this._createMarker(latlng));
 
+		// show distance of last section of the polyline
+		if (this._markers.length >= 2) {
+			// calculate distances
+			var prevMarker = this._markers[this._markers.length - 2].getLatLng();
+			var lastMarker = this._markers[this._markers.length - 1].getLatLng();
+			var currentDistance = lastMarker.distanceTo(prevMarker);
+			var totalDistance = this._measurementRunningTotal + currentDistance;
+			var readableDistances = {
+				current: L.GeometryUtil.readableDistance(currentDistance, this.options.metric),
+				total: L.GeometryUtil.readableDistance(totalDistance, this.options.metric),
+			};
+
+			//console.log(readableDistances);
+		
+			// show tooltip with distances
+			this._tooltip.updatePosition(lastMarker);
+			var labelText = {
+				text: readableDistances.total,
+			};
+			if (currentDistance != totalDistance) {
+				labelText.subtext = readableDistances.current;
+			}
+			this._tooltip.updateContent(labelText);
+		}
+
 		this._poly.addLatLng(latlng);
 
 		if (this._poly.getLatLngs().length === 2) {
