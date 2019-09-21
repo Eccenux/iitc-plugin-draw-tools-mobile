@@ -676,7 +676,8 @@ L.Draw.Polygon = L.Draw.Polyline.extend({
 	},
 
 	_getMeasurementString: function () {
-		var area = this._area;
+		var latLngs = this._poly.getLatLngs();
+		var area = L.GeometryUtil.geodesicArea(latLngs);
 
 		if (!area) {
 			return null;
