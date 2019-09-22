@@ -388,8 +388,8 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			this._updateFinishHandler();
 		//}, 1000);
 		
-		this._updateTooltip(latlng);
 		this._vertexAdded(latlng);
+		this._updateTooltip(latlng);
 
 		this._clearGuides();
 	},
@@ -417,13 +417,17 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			this._updateFinishHandler();
 		//}, 1000);
 
-		// reset tooltip to last exisiting marker
+		// update tooltip data
 		if (this._markers.length > 0) {
 			var latlng = this._markers[this._markers.length - 1].getLatLng();
+			// reset/correct total distance
+			var removedDistance = this._measurementRunningTotals.pop();
+			this._measurementRunningTotal -= removedDistance;
+			// reset tooltip to last exisiting marker
 			this._updateTooltip(latlng);
-			// TODO reset/correct total distance 
-			// this._vertexAdded(latlng);
 		} else {
+			this._measurementRunningTotals = [];
+			this._measurementRunningTotal = 0;
 			this._updateTooltip();
 		}
 
@@ -560,22 +564,14 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 	},
 
 	_getMeasurementString: function () {
-		/*
-		var currentLatLng = this._currentLatLng,
-			previousLatLng = this._markers[this._markers.length - 1].getLatLng(),
-			distance;
-		*/
-
 		// skip if only marker is positioned
 		if (this._markers.length < 2) {
 			return "";
 		}
 
 		// calculate distances
-		var prevMarker = this._markers[this._markers.length - 2].getLatLng();
-		var lastMarker = this._markers[this._markers.length - 1].getLatLng();
-		var currentDistance = lastMarker.distanceTo(prevMarker);
-		var totalDistance = this._measurementRunningTotal + currentDistance;
+		var currentDistance = this._measurementRunningTotals[this._measurementRunningTotals.length - 1];
+		var totalDistance = this._measurementRunningTotal;
 		var readableDistances = {
 			current: L.GeometryUtil.readableDistance(currentDistance, this.options.metric),
 			total: L.GeometryUtil.readableDistance(totalDistance, this.options.metric),
@@ -630,13 +626,16 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		}
 	},
 
+	// this is used for distance calculations (for tooltip)
 	_vertexAdded: function (latlng) {
 		if (this._markers.length === 1) {
 			this._measurementRunningTotal = 0;
+			this._measurementRunningTotals = [];
 		}
 		else {
-			this._measurementRunningTotal +=
-				latlng.distanceTo(this._markers[this._markers.length - 2].getLatLng());
+			var newSegment = latlng.distanceTo(this._markers[this._markers.length - 2].getLatLng());
+			this._measurementRunningTotal += newSegment;
+			this._measurementRunningTotals.push(newSegment);
 		}
 	},
 
