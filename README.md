@@ -24,7 +24,7 @@ Features
 4. Undo action for lines and polygons -- removes last segment so you can try again. You can remove all points and try again.
 5. Undo action for markers -- remove a marker quickly without the need to switch to delete mode. This works for all markers added in one go (so you don't accidently remove your old markers).
 
-Test it out at let me know if you have some other ideas :-).
+Test it out at let me know if you have some other ideas 🙂.
 
 <img src="https://raw.githubusercontent.com/Eccenux/iitc-plugin-draw-tools-mobile/master/screens/line_segment_lenght_and_undo.png" width="740" alt=" ">
 <img src="https://raw.githubusercontent.com/Eccenux/iitc-plugin-draw-tools-mobile/master/screens/polygon_area_and_undo.png" width="360" alt=" ">
