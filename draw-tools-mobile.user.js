@@ -2129,9 +2129,10 @@ L.Toolbar = L.Class.extend({
 	},
 
 	_showActionsToolbar: function () {
+		var button = document.querySelector('.leaflet-touch .leaflet-bar a');	// any button, just for calculations
 		var buttonIndex = this._activeMode.buttonIndex,
 			lastButtonIndex = this._lastButtonIndex,
-			buttonHeight = 26, // TODO: this should be calculated
+			buttonHeight = button ? button.clientHeight : 26, 
 			borderHeight = 1, // TODO: this should also be calculated
 			toolbarPosition = (buttonIndex * buttonHeight) + (buttonIndex * borderHeight) - 1;
 
