@@ -1,4 +1,5 @@
 ﻿// ==UserScript==
+// @author         jonatkins, Eccenux
 // @id             iitc-plugin-draw-tools-mobile@eccenux
 // @name           IITC plugin: draw tools mobile
 // @category       Layer
@@ -16,6 +17,8 @@
 // @include        https://intel.ingress.com/*
 // @match          https://intel.ingress.com/*
 // @grant          none
+// @updateURL      https://github.com/Eccenux/iitc-plugin-draw-tools-mobile/raw/master/draw-tools-mobile.meta.js
+// @downloadURL    https://github.com/Eccenux/iitc-plugin-draw-tools-mobile/raw/master/draw-tools-mobile.user.js
 // ==/UserScript==
 
 
