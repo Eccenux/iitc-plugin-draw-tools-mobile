@@ -51,8 +51,14 @@ L.drawLocal = {
 	draw: {
 		toolbar: {
 			actions: {
-				title: 'Cancel drawing',
-				text: 'Cancel'
+				undo: {
+					title: 'Undo last',
+					text: 'Undo'
+				},
+				cancel: {
+					title: 'Cancel drawing',
+					text: 'Cancel'
+				},
 			},
 			buttons: {
 				polyline: 'Draw a polyline',
@@ -384,6 +390,42 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		
 		this._updateTooltip(latlng);
 		this._vertexAdded(latlng);
+
+		this._clearGuides();
+	},
+
+	undo: function () {
+		var markerCount = this._markers.length;
+		if (markerCount < 1) {
+			return;
+		}
+		//console.log('undo poly', {this:this, markers: this._markers, poly: this._poly})
+
+		//this._markers.push(this._createMarker(latlng));
+		var marker = this._markers.pop();
+		this._markerGroup.removeLayer(marker);
+
+		//this._poly.addLatLng(latlng);
+		var markerIndex = markerCount - 1;
+		this._map.removeLayer(this._poly);
+		this._poly.spliceLatLngs(markerIndex, 1);
+		if (this._poly.getLatLngs().length >= 2) {
+			this._map.addLayer(this._poly);
+		}
+
+		//setTimeout(()=>{
+			this._updateFinishHandler();
+		//}, 1000);
+
+		// reset tooltip to last exisiting marker
+		if (this._markers.length > 0) {
+			var latlng = this._markers[this._markers.length - 1].getLatLng();
+			this._updateTooltip(latlng);
+			// TODO reset/correct total distance 
+			// this._vertexAdded(latlng);
+		} else {
+			this._updateTooltip();
+		}
 
 		this._clearGuides();
 	},
@@ -2302,11 +2344,17 @@ L.DrawToolbar = L.Toolbar.extend({
 		// Create the actions part of the toolbar
 		this._actionsContainer = this._createActions([
 			{
-				title: L.drawLocal.draw.toolbar.actions.title,
-				text: L.drawLocal.draw.toolbar.actions.text,
+				title: L.drawLocal.draw.toolbar.actions.undo.title,
+				text: L.drawLocal.draw.toolbar.actions.undo.text,
+				callback: this.undo,
+				context: this
+			},
+			{
+				title: L.drawLocal.draw.toolbar.actions.cancel.title,
+				text: L.drawLocal.draw.toolbar.actions.cancel.text,
 				callback: this.disable,
 				context: this
-			}
+			},
 		]);
 
 		// Add draw and cancel containers to the control container
@@ -2314,6 +2362,13 @@ L.DrawToolbar = L.Toolbar.extend({
 		container.appendChild(this._actionsContainer);
 
 		return container;
+	},
+
+	undo: function () {
+		if (this._activeMode.handler.undo) {
+			console.log('undo', this, this._activeMode.handler);
+			this._activeMode.handler.undo();
+		}
 	},
 
 	setOptions: function (options) {
