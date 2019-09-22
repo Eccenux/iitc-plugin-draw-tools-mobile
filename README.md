@@ -21,6 +21,7 @@ Features
 1. Touch device support (smrtphones, laptop touch screens etc).
 2. Show lenght of last section of a poly-line (last segment distance and total distance).
 3. Show are for polygon being drawn.
+4. Easily finish shapes by tapping on a tooltip beside last point. Now you don't have tap on the last point (which can be hard with large fingers 😉). Just tap the tip and your done.
 4. Undo action for lines and polygons -- removes last segment so you can try again. You can remove all points and try again.
 5. Undo action for markers -- remove a marker quickly without the need to switch to delete mode. This works for all markers added in one go (so you don't accidently remove your old markers).
 
