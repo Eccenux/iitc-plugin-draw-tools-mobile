@@ -3,8 +3,8 @@
 // @name           IITC plugin: draw tools mobile
 // @category       Layer
 // @namespace      https://github.com/jonatkins/ingress-intel-total-conversion
-// @version        0.2.3
-// @description    [0.2.3] Allow drawing things onto the current map so you may plan your next move. Mobile device optimization.
+// @version        0.2.4
+// @description    [0.2.4] Allow drawing things onto the current map so you may plan your next move. Mobile device optimization.
 // @include        https://*.ingress.com/intel*
 // @include        http://*.ingress.com/intel*
 // @match          https://*.ingress.com/intel*
