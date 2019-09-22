@@ -26,5 +26,5 @@ Features
 
 Test it out at let me know if you have some other ideas :-).
 
-<img src="https://raw.githubusercontent.com/Eccenux/iitc-plugin-draw-tools-mobile/master/screens/line_segment_lenght_and_undo.png" width="360" alt=" ">
-<img src="https://raw.githubusercontent.com/Eccenux/iitc-plugin-draw-tools-mobile/master/screens/polygon_area_and_undo.png" width="740" alt=" ">
+<img src="https://raw.githubusercontent.com/Eccenux/iitc-plugin-draw-tools-mobile/master/screens/line_segment_lenght_and_undo.png" width="740" alt=" ">
+<img src="https://raw.githubusercontent.com/Eccenux/iitc-plugin-draw-tools-mobile/master/screens/polygon_area_and_undo.png" width="360" alt=" ">
