@@ -2328,6 +2328,18 @@ L.DrawToolbar = L.Toolbar.extend({
 		}
 
 		L.Toolbar.prototype.initialize.call(this, options);
+
+		// handle undo action show/hide (upon action activation)
+		this.on('enable', function(e) {
+			//console.log('enable: ', e, this._activeMode.handler);
+			var undoAction = this._actionsContainer.querySelector('li');
+			// check if the handler supports undo
+			if (this._activeMode.handler.undo) {
+				undoAction.style.display = '';
+			} else {
+				undoAction.style.display = 'none';
+			}
+		})
 	},
 
 	addToolbar: function (map) {
