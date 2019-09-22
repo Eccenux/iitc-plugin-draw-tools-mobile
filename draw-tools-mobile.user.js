@@ -418,16 +418,12 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		//}, 1000);
 
 		// update tooltip data
+		this._vertexRemoved();
 		if (this._markers.length > 0) {
-			var latlng = this._markers[this._markers.length - 1].getLatLng();
-			// reset/correct total distance
-			var removedDistance = this._measurementRunningTotals.pop();
-			this._measurementRunningTotal -= removedDistance;
 			// reset tooltip to last exisiting marker
+			var latlng = this._markers[this._markers.length - 1].getLatLng();
 			this._updateTooltip(latlng);
 		} else {
-			this._measurementRunningTotals = [];
-			this._measurementRunningTotal = 0;
 			this._updateTooltip();
 		}
 
@@ -636,6 +632,31 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			var newSegment = latlng.distanceTo(this._markers[this._markers.length - 2].getLatLng());
 			this._measurementRunningTotal += newSegment;
 			this._measurementRunningTotals.push(newSegment);
+		}
+	},
+	// reset/correct total distance
+	_vertexRemoved: function (marker) {
+		if (!(this._measurementRunningTotals instanceof Array)) {
+			return;
+		}
+		if (this._markers.length > 1) {
+			var removedDistance = this._measurementRunningTotals.pop();
+			this._measurementRunningTotal -= removedDistance;
+			//console.log('[_vertexRemoved] pop', removedDistance);
+			/**
+			var totalDebug = this._measurementRunningTotals.reduce((prev, curr)=>prev+curr);
+			var rounded = {
+				expected : Math.round(totalDebug * 1000) / 1000,
+				actual : Math.round(this._measurementRunningTotal * 1000) / 1000,
+			};
+			if (rounded.expected != rounded.expected) {
+				console.warn('[_vertexRemoved] wrong total: ', rounded);
+			}
+			/**/
+		} else {
+			//console.log('[_vertexRemoved] reset');
+			this._measurementRunningTotals = [];
+			this._measurementRunningTotal = 0;
 		}
 	},
 
