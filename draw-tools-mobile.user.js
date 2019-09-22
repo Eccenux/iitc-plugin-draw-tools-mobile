@@ -1032,6 +1032,9 @@ L.Draw.Marker = L.Draw.Feature.extend({
 		if (this._map) {
 			this._tooltip.updateContent({ text: L.drawLocal.draw.handlers.marker.tooltip.start });
 
+			// keep references for undo (should only remove features added in current session)
+			this._markersAdded = [];
+
 			// same as for polyline
 			/**/
 			// remove previous listener (shouldn't really happen)
@@ -1061,6 +1064,9 @@ L.Draw.Marker = L.Draw.Feature.extend({
 		//console.log('[Draw.Marker]', 'removeHooks', arguments);
 		L.Draw.Feature.prototype.removeHooks.call(this);
 
+		// remove references (note, just removing references; markers should be kept on the map)
+		this._markersAdded = [];
+
 		if (this._map) {
 			if (this._clickListener && this._map && this._map._container instanceof Element) {
 				this._map._container.removeEventListener('click', this._clickListener, true);
@@ -1088,17 +1094,41 @@ L.Draw.Marker = L.Draw.Feature.extend({
 			zIndexOffset: this.options.zIndexOffset
 		});
 		this._map.addLayer(this._marker);
+		// keep reference
+		this._markersAdded.push(this._marker);
 		/**/
 
 		if (this.options.snapPoint) this._marker.setLatLng(this.options.snapPoint(this._marker.getLatLng()));
 
 		this._fireCreatedEvent();
 
-		// disable & enable adding next marker
-		this.disable();
-		if (this.options.repeatMode) {
-			this.enable();
+		// disable handler to stop adding markers
+		if (!this.options.repeatMode) {
+			//this.enable();
+			this.disable();
 		}
+	},
+
+	/**
+	 * Undo last marker.
+	 * 
+	 * Note! This is meant to only affect markers added in current session
+	 * (session ends with cancel).
+	 */
+	undo: function() {
+		if (this._markersAdded.length < 1) {
+			console.log('no more markers for this session');
+			return;
+		}
+		var marker = this._markersAdded.pop();
+		// remove from map
+		this._map.removeLayer(marker);
+		// remove from drawtools internals
+		window.plugin.drawTools.drawnItems.removeLayer(marker);
+		// this is used in edit tools
+		// (don't seem to do anything internally, but might be used by other plugins) 
+		this._map.fire('draw:deleted', { layers: [marker] });
+		//delete marker;
 	},
 
 	_fireCreatedEvent: function () {
